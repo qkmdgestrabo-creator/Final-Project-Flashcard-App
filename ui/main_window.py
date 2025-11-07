@@ -132,7 +132,7 @@ class MainWindow(QWidget):
     def setup_sidebar_content(self):
         # Create a layout for the sidebar box
         sidebar_layout = QVBoxLayout()
-        sidebar_layout.setContentsMargins(10, 20, 10, 20)  # Padding inside the box
+        sidebar_layout.setContentsMargins(10, 20, 10, 20)  # Padding inside the box 
         sidebar_layout.setSpacing(10)
         
         # Navigation buttons - these will be INSIDE the sidebar box

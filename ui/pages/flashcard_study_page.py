@@ -25,10 +25,10 @@ class FlashcardStudyPage(QWidget):
         layout.setSpacing(15)
         layout.setContentsMargins(20, 20, 20, 20)
         
-        # HEADER SECTION
+        # HEADER - Just set name and back button
         header_layout = QHBoxLayout()
         
-        # Set name
+        # Set name - left
         set_name_text = self.flashcard_set['set_name'] if self.flashcard_set else "No Set Selected"
         self.set_name_label = QLabel(set_name_text)
         self.set_name_label.setStyleSheet(self.styles["title"])
@@ -36,50 +36,37 @@ class FlashcardStudyPage(QWidget):
         
         header_layout.addStretch()
         
-        # Progress bar
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setMaximum(100)
-        self.progress_bar.setFixedWidth(150)
-        self.progress_bar.setStyleSheet(self.styles["progress_bar"])
-        header_layout.addWidget(self.progress_bar)
-        
-        # Stats
-        self.stats_label = QLabel("Mastered: 0/0")
-        self.stats_label.setStyleSheet(self.styles["stats_label"])
-        header_layout.addWidget(self.stats_label)
-        
-        # Shuffle toggle
-        self.shuffle_btn = QPushButton("Shuffle")
-        self.shuffle_btn.setStyleSheet(self.styles["shuffle_button"])
-        self.shuffle_btn.clicked.connect(self.shuffle_cards)
-        header_layout.addWidget(self.shuffle_btn)
+        # Back button - right
+        self.back_btn = QPushButton("← Back to All Cards")
+        self.back_btn.setStyleSheet(self.styles["back_button"])
+        self.back_btn.clicked.connect(self.go_back)
+        header_layout.addWidget(self.back_btn)
         
         layout.addLayout(header_layout)
         
-        # CARD COUNTER
-        self.card_counter = QLabel("Card 1 of 1")
-        self.card_counter.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.card_counter.setStyleSheet(self.styles["card_counter"])
-        layout.addWidget(self.card_counter)
-        
-        # FLIP CARD AREA - LARGER SIZE
+        # FLIP CARD AREA - with card counter
         card_area_layout = QHBoxLayout()
         card_area_layout.addStretch()
         
-        # Flip card container - INCREASED SIZE
         self.flip_card_container = QFrame()
-        self.flip_card_container.setFixedSize(800, 600)
+        self.flip_card_container.setFixedSize(1000, 800)
         
-        # Create flip card
+        # Create flip card with card counter
         self.setup_flip_card()
         card_area_layout.addWidget(self.flip_card_container)
         card_area_layout.addStretch()
         
         layout.addLayout(card_area_layout)
         
-        # CONTROLS SECTION - CENTERED
+        # CONTROLS BELOW PROGRESS BAR - Horizontal: Shuffle, Correct, Wrong, Reset
         controls_layout = QHBoxLayout()
         controls_layout.addStretch()
+        
+        # Shuffle button
+        self.shuffle_btn = QPushButton("Shuffle")
+        self.shuffle_btn.setStyleSheet(self.styles["shuffle_button"])
+        self.shuffle_btn.clicked.connect(self.shuffle_cards)
+        controls_layout.addWidget(self.shuffle_btn)
         
         # Correct button
         self.correct_btn = QPushButton("Correct")
@@ -93,52 +80,61 @@ class FlashcardStudyPage(QWidget):
         self.wrong_btn.clicked.connect(lambda: self.mark_card(False))
         controls_layout.addWidget(self.wrong_btn)
         
-        controls_layout.addStretch()
-        layout.addLayout(controls_layout)
-        
-        # SECONDARY CONTROLS
-        secondary_layout = QHBoxLayout()
-        secondary_layout.addStretch()
-        
         # Reset progress
         self.reset_btn = QPushButton("Reset Progress")
         self.reset_btn.setStyleSheet(self.styles["reset_button"])
         self.reset_btn.clicked.connect(self.reset_progress)
-        secondary_layout.addWidget(self.reset_btn)
+        controls_layout.addWidget(self.reset_btn)
         
-        
-        secondary_layout.addStretch()
-        layout.addLayout(secondary_layout)
-        
-        # FOOTER
-        footer_layout = QHBoxLayout()
-        footer_layout.addStretch()
-        
-        self.back_btn = QPushButton("← Back to All Cards")
-        self.back_btn.setStyleSheet(self.styles["back_button"])
-        self.back_btn.clicked.connect(self.go_back)
-        footer_layout.addWidget(self.back_btn)
-        
-        footer_layout.addStretch()
-        layout.addLayout(footer_layout)
+        controls_layout.addStretch()
+        layout.addLayout(controls_layout)
         
         self.setLayout(layout)
+        
+        # PROGRESS BAR - Below flip card
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMaximum(100)
+        self.progress_bar.setStyleSheet(self.styles["progress_bar"])
+        layout.addWidget(self.progress_bar)
     
     def setup_flip_card(self):
+        # Create front card with counter
         self.card_front = QFrame()
         self.card_front.setStyleSheet(self.styles["card_front"])
         
-        self.card_back = QFrame()
-        self.card_back.setStyleSheet(self.styles["card_back"])
-        
         front_layout = QVBoxLayout(self.card_front)
+        
+        # Card counter on front - simple text like before
+        self.front_counter = QLabel("Card 1 of 1")
+        self.front_counter.setStyleSheet(self.styles["card_counter"])
+        self.front_counter.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        front_layout.addWidget(self.front_counter)
+        
+        # Front content
         self.front_label = QLabel()
         self.front_label.setStyleSheet(self.styles["card_text"])
         self.front_label.setWordWrap(True)
         self.front_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         front_layout.addWidget(self.front_label)
+        self.front_counter.setFixedHeight(15) 
+
+        
+        
+        # Create back card with counter
+        self.card_back = QFrame()
+        self.card_back.setStyleSheet(self.styles["card_back"])
         
         back_layout = QVBoxLayout(self.card_back)
+        
+        # Card counter on back - simple text like before
+        self.back_counter = QLabel("Card 1 of 1")
+        self.back_counter.setStyleSheet(self.styles["card_counter"])
+        self.back_counter.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        back_layout.addWidget(self.back_counter)
+        self.back_counter.setFixedHeight(15)
+
+        
+        # Back content
         self.back_label = QLabel()
         self.back_label.setStyleSheet(self.styles["card_text"])
         self.back_label.setWordWrap(True)
@@ -149,6 +145,7 @@ class FlashcardStudyPage(QWidget):
         self.card_back.hide()
         self.card_front.show()
         
+        # Add both cards to container
         flip_layout = QVBoxLayout(self.flip_card_container)
         flip_layout.addWidget(self.card_front)
         flip_layout.addWidget(self.card_back)
@@ -191,7 +188,9 @@ class FlashcardStudyPage(QWidget):
     def update_card_counter(self):
         total = len(self.flashcard_set['cards'])
         current = self.current_card_index + 1
-        self.card_counter.setText(f"Card {current} of {total}")
+        counter_text = f"Card {current} of {total}"
+        self.front_counter.setText(counter_text)
+        self.back_counter.setText(counter_text)
     
     def update_progress(self):
         # Calculate progress based on mastered cards (3 correct answers)
@@ -205,7 +204,6 @@ class FlashcardStudyPage(QWidget):
         
         progress = (mastered_cards / total_cards) * 100 if total_cards > 0 else 0
         self.progress_bar.setValue(int(progress))
-        self.stats_label.setText(f"Mastered: {mastered_cards}/{total_cards}")
     
     def mark_card(self, correct):
         from core.controller import FlashcardController

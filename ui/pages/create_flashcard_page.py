@@ -18,7 +18,7 @@ class CreateFlashcard(QWidget):
         # Main layout - no margins for full window usage
         main_layout = QVBoxLayout()
         main_layout.setSpacing(0)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setContentsMargins(85, 0, 85, 0) # Left, top, Right, Bottom
         self.setLayout(main_layout)
         
         # Scroll area for all content (title, set name, flashcards)
@@ -47,7 +47,7 @@ class CreateFlashcard(QWidget):
         self.name_input.setStyleSheet(self.styles["name_input"])
         self.scroll_layout.addWidget(self.name_input)
         
-        # Create 3 initial empty flashcards
+        # Create 4 initial empty flashcards
         self.create_flashcard_inputs()
         
         # Add stretch to push content up
@@ -66,43 +66,66 @@ class CreateFlashcard(QWidget):
         button_layout.setContentsMargins(20, 10, 20, 10)
         button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        # Create the three main buttons
+        # Create the four main buttons
         self.add_btn = QPushButton("Add Flashcard")
         self.add_btn.setStyleSheet(self.styles["add_button"])
         self.save_btn = QPushButton("Save Flashcard")
         self.save_btn.setStyleSheet(self.styles["save_button"])
-        self.cancel_btn = QPushButton("Cancel")
-        self.cancel_btn.setStyleSheet(self.styles["cancel_button"])
+        self.reset_btn = QPushButton("Reset")
+        self.reset_btn.setStyleSheet(self.styles["cancel_button"])  # Using cancel style for reset
+        self.back_btn = QPushButton("Back")
+        self.back_btn.setStyleSheet(self.styles["cancel_button"])
         
         # Add buttons to layout
         button_layout.addWidget(self.add_btn)
         button_layout.addWidget(self.save_btn)
-        button_layout.addWidget(self.cancel_btn)
+        button_layout.addWidget(self.reset_btn)
+        button_layout.addWidget(self.back_btn)
         
         # Connect button clicks to functions
         self.add_btn.clicked.connect(self.add_flashcard_input)
         self.save_btn.clicked.connect(self.save_all_flashcards)
-        self.cancel_btn.clicked.connect(self.go_back)
+        self.reset_btn.clicked.connect(self.show_reset_warning)
+        self.back_btn.clicked.connect(self.go_back)
     
     def resizeEvent(self, event):
         self.floating_button_container.setGeometry(0, self.height() - 150, self.width(), 150)
         super().resizeEvent(event)
     
     def create_flashcard_inputs(self):
-        #Create 3 initial flashcard input sections
-        for i in range(3):
+        # Create 4 initial flashcard input sections
+        for i in range(4):
             self.add_flashcard_input()
 
     def add_flashcard_input(self):
         # Create card container frame
         card_frame = QFrame()
-        card_frame.setStyleSheet(self.styles["card_frame"])
+        
+        # Apply color cycling based on card position
+        color_index = (self.current_card_number - 1) % 4 + 1
+        card_frame.setStyleSheet(self.styles[f"card_frame_{color_index}"])
         
         card_layout = QVBoxLayout(card_frame)
+        
+        # Card header with number and remove button (only show remove for cards 5+)
+        card_header = QHBoxLayout()
         
         # Card number label
         card_number = QLabel(f"Card {self.current_card_number}")
         card_number.setStyleSheet(self.styles["card_number"])
+        
+        card_header.addWidget(card_number)
+        
+        # Only add remove button for cards 5 and above
+        if self.current_card_number >= 5:
+            remove_btn = QPushButton("✗")
+            remove_btn.setFixedSize(30, 30)
+            remove_btn.setStyleSheet(self.styles["remove_btn"])
+            remove_btn.clicked.connect(lambda checked, frame=card_frame: self.remove_flashcard(frame))
+            card_header.addStretch()
+            card_header.addWidget(remove_btn)
+        else:
+            card_header.addStretch()  # Push card number to left for cards 1-4
         
         # Question input field
         question_input = QLineEdit()
@@ -122,7 +145,7 @@ class CreateFlashcard(QWidget):
         card_frame.card_number = self.current_card_number
         
         # Add widgets to card layout
-        card_layout.addWidget(card_number)
+        card_layout.addLayout(card_header)
         card_layout.addWidget(question_input)  
         card_layout.addWidget(answer_input)    
         
@@ -135,8 +158,96 @@ class CreateFlashcard(QWidget):
         # Auto-scroll to show the new card
         self._scroll_to_bottom()
 
+    def remove_flashcard(self, card_frame):
+        # Count current cards
+        current_card_count = self.count_flashcards()
+        
+        # Prevent removal if it would go below minimum 4 cards
+        if current_card_count <= 4:
+            QMessageBox.warning(self, "Minimum Cards", "You must have at least 4 flashcards.")
+            return
+        
+        # Remove the card frame from layout
+        self.scroll_layout.removeWidget(card_frame)
+        card_frame.deleteLater()
+        
+        # Re-number all remaining cards and update colors
+        self.renumber_cards()
+
+    def count_flashcards(self):
+        count = 0
+        for i in range(self.scroll_layout.count()):
+            item = self.scroll_layout.itemAt(i)
+            if item and item.widget():
+                widget = item.widget()
+                if isinstance(widget, QFrame) and hasattr(widget, 'question_input'):
+                    count += 1
+        return count
+
+    def renumber_cards(self):
+        # Re-number all cards and update their colors
+        card_frames = []
+        
+        # Collect all card frames
+        for i in range(self.scroll_layout.count()):
+            item = self.scroll_layout.itemAt(i)
+            if item and item.widget():
+                widget = item.widget()
+                if isinstance(widget, QFrame) and hasattr(widget, 'question_input'):
+                    card_frames.append(widget)
+        
+        # Re-number and update colors
+        for index, card_frame in enumerate(card_frames, 1):
+            # Find the card number label in the card header
+            card_header = card_frame.layout().itemAt(0).layout()
+            card_number_label = card_header.itemAt(0).widget()
+            card_number_label.setText(f"Card {index}")
+            
+            # Update the stored card number
+            card_frame.card_number = index
+            
+            # Update color based on new position
+            color_index = (index - 1) % 4 + 1
+            card_frame.setStyleSheet(self.styles[f"card_frame_{color_index}"])
+            
+            # Update remove button visibility (only show for cards 5+)
+            self.update_remove_button_visibility(card_frame, index)
+        
+        # Reset current_card_number to continue from the correct number
+        self.current_card_number = len(card_frames) + 1
+
+    def update_remove_button_visibility(self, card_frame, card_number):
+        #Show/hide remove button based on card number
+        card_header = card_frame.layout().itemAt(0).layout()
+        
+        # First, remove any existing remove button by checking widget types
+        for i in range(card_header.count() - 1, -1, -1):
+            item = card_header.itemAt(i)
+            if item and item.widget() and isinstance(item.widget(), QPushButton):
+                remove_btn = item.widget()
+                card_header.removeWidget(remove_btn)
+                remove_btn.deleteLater()
+        
+        # Also remove any stretch that might be before the button
+        for i in range(card_header.count() - 1, -1, -1):
+            item = card_header.itemAt(i)
+            if item and item.layout() is None and item.widget() is None:  # It's a stretch
+                card_header.removeItem(item)
+        
+        # Add remove button only for cards 5+
+        if card_number >= 5:
+            remove_btn = QPushButton("✗")
+            remove_btn.setFixedSize(30, 30)
+            remove_btn.setStyleSheet(self.styles['remove_btn'])
+            remove_btn.clicked.connect(lambda checked, frame=card_frame: self.remove_flashcard(frame))
+            card_header.addStretch()
+            card_header.addWidget(remove_btn)
+        else:
+            # Ensure cards 1-4 have proper layout with stretch
+            card_header.addStretch()
+
     def _scroll_to_bottom(self):
-        #Scroll to bottom instantly without any delays
+        # Scroll to bottom instantly without any delays
         scrollbar = self.scroll_area.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
@@ -146,7 +257,7 @@ class CreateFlashcard(QWidget):
             self.flashcards = []
             set_name = self.name_input.text().strip()
             
-            # Validate set name - CORRECT WAY
+            # Validate set name
             if not set_name:
                 missing_set_warning = QMessageBox(self)
                 missing_set_warning.setWindowTitle("Missing Set Name")
@@ -168,8 +279,9 @@ class CreateFlashcard(QWidget):
                 missing_set_warning.exec()
                 return
         
-            # Loop through all card frames and collect data
-            for i in range(self.scroll_layout.count() - 1):
+            # Count valid flashcards
+            valid_cards = 0
+            for i in range(self.scroll_layout.count()):
                 item = self.scroll_layout.itemAt(i)
                 if item and item.widget():
                     widget = item.widget()
@@ -185,27 +297,28 @@ class CreateFlashcard(QWidget):
                                 'answer': answer
                             }
                             self.flashcards.append(card_data)
+                            valid_cards += 1
             
-            # Validate we have at least one flashcard
-            if not self.flashcards:
-                no_flashcard_warning = QMessageBox(self)
-                no_flashcard_warning.setWindowTitle("No Flashcards ")
-                no_flashcard_warning.setText("Please fill in at least one flashcard.")
-                no_flashcard_warning.setStyleSheet(self.styles["warning_message_box"])
-                no_flashcard_warning.setIcon(QMessageBox.Icon.Warning)
-                no_flashcard_warning.setStandardButtons(QMessageBox.StandardButton.Ok)
+            # Validate we have at least 4 flashcards
+            if valid_cards < 4:
+                min_cards_warning = QMessageBox(self)
+                min_cards_warning.setWindowTitle("Not Enough Flashcards")
+                min_cards_warning.setText(f"You need at least 4 flashcards. You currently have {valid_cards} valid card(s).")
+                min_cards_warning.setStyleSheet(self.styles["warning_message_box"])
+                min_cards_warning.setIcon(QMessageBox.Icon.Warning)
+                min_cards_warning.setStandardButtons(QMessageBox.StandardButton.Ok)
                     
                 # Load custom icon  
                 icon_path = get_asset_path("warning_icon.png")  
                 custom_icon = QPixmap(icon_path)
                 
                 if not custom_icon.isNull():
-                    no_flashcard_warning.setIconPixmap(custom_icon.scaled(74, 74, Qt.AspectRatioMode.KeepAspectRatio))
+                    min_cards_warning.setIconPixmap(custom_icon.scaled(74, 74, Qt.AspectRatioMode.KeepAspectRatio))
                 else:
-                    no_flashcard_warning.setIcon(QMessageBox.Icon.Information)
+                    min_cards_warning.setIcon(QMessageBox.Icon.Information)
                     
-                no_flashcard_warning.setStandardButtons(QMessageBox.StandardButton.Ok)
-                no_flashcard_warning.exec()
+                min_cards_warning.setStandardButtons(QMessageBox.StandardButton.Ok)
+                min_cards_warning.exec()
                 return
             
             # Use controller to save the flashcard set
@@ -235,8 +348,7 @@ class CreateFlashcard(QWidget):
             else:
                 # SUCCESS MESSAGE BOX
                 self.show_save_success(set_name, len(self.flashcards))
-                self.clear_form()
-                self.name_input.clear()
+                self.reset_form()
 
         except Exception as e:
             critical_error_warning = QMessageBox(self)
@@ -259,7 +371,6 @@ class CreateFlashcard(QWidget):
             critical_error_warning.exec()
 
     def show_save_success(self, set_name, card_count):
-
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("Success!")
         msg_box.setText(f"Flashcard set '{set_name}' saved successfully!")
@@ -280,26 +391,11 @@ class CreateFlashcard(QWidget):
         msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
         msg_box.exec()
 
-    def clear_form(self):
-        # Clear all flashcard inputs but keep the form structure
-        for i in range(self.scroll_layout.count() - 1):
-            item = self.scroll_layout.itemAt(i)
-            if item and item.widget():
-                widget = item.widget()
-                # Only clear QFrame widgets (the card containers)
-                if isinstance(widget, QFrame):
-                    # Check if the frame has the question_input attribute
-                    if hasattr(widget, 'question_input'):
-                        widget.question_input.clear()
-                    if hasattr(widget, 'answer_input'):
-                        widget.answer_input.clear()
-
-    def go_back(self):
-        #Show confirmation dialog with custom icon
-    
+    def show_reset_warning(self):
+        # Show custom warning dialog for reset action
         msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("Confirm Cancel")
-        msg_box.setText("Are you sure you want to cancel?")
+        msg_box.setWindowTitle("Confirm Reset")
+        msg_box.setText("Are you sure you want to reset?")
         msg_box.setInformativeText("All unsaved changes will be lost.")
         
         # Apply the warning style
@@ -318,4 +414,28 @@ class CreateFlashcard(QWidget):
         msg_box.setDefaultButton(QMessageBox.StandardButton.No)
         
         if msg_box.exec() == QMessageBox.StandardButton.Yes:
-            self.main_window.show_page(0)
+            self.reset_form()
+
+    def reset_form(self):
+        # Reset the form to 4 empty flashcards
+        # Remove all existing card frames
+        for i in range(self.scroll_layout.count() - 1, -1, -1):
+            item = self.scroll_layout.itemAt(i)
+            if item and item.widget():
+                widget = item.widget()
+                if isinstance(widget, QFrame) and hasattr(widget, 'question_input'):
+                    self.scroll_layout.removeWidget(widget)
+                    widget.deleteLater()
+        
+        # Clear set name
+        self.name_input.clear()
+        
+        # Reset card counter
+        self.current_card_number = 1
+        
+        # Create 4 new flashcards
+        self.create_flashcard_inputs()
+
+    def go_back(self):
+        # Simply go back to main page without warning
+        self.main_window.show_page(0)

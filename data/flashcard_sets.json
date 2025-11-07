@@ -7,36 +7,36 @@
                 "question": "Question 1",
                 "answer": "Answer 1",
                 "progress": {
-                    "learned": true,
-                    "times_correct": 14,
-                    "times_wrong": 6
+                    "learned": false,
+                    "times_correct": 31,
+                    "times_wrong": 19
                 }
             },
             {
                 "question": "Question 2",
                 "answer": "Question 2",
                 "progress": {
-                    "learned": true,
-                    "times_correct": 14,
-                    "times_wrong": 6
+                    "learned": false,
+                    "times_correct": 30,
+                    "times_wrong": 19
                 }
             },
             {
                 "question": "Question 2",
                 "answer": "Question 2",
                 "progress": {
-                    "learned": true,
-                    "times_correct": 14,
-                    "times_wrong": 6
+                    "learned": false,
+                    "times_correct": 30,
+                    "times_wrong": 18
                 }
             },
             {
                 "question": "Question 4",
                 "answer": "Question 4",
                 "progress": {
-                    "learned": true,
-                    "times_correct": 12,
-                    "times_wrong": 8
+                    "learned": false,
+                    "times_correct": 24,
+                    "times_wrong": 21
                 }
             }
         ]
@@ -88,20 +88,24 @@
         ]
     },
     {
-        "set_name": "asd",
-        "created_date": "2025-11-07 02:53:34",
+        "set_name": "QWWDAS",
+        "created_date": "2025-11-07 23:34:26",
         "cards": [
             {
-                "question": "asda",
-                "answer": "dsaasd"
+                "question": "ASDAS",
+                "answer": "DASDAS"
             },
             {
-                "question": "asdas",
-                "answer": "dasdsaadas"
+                "question": "DASDAS",
+                "answer": "DAS"
             },
             {
-                "question": "dasdasdasdsa",
-                "answer": "asdassa"
+                "question": "DASD",
+                "answer": "ASDAS"
+            },
+            {
+                "question": "ASDASD",
+                "answer": "ASD"
             }
         ]
     }

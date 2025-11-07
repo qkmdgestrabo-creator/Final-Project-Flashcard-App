@@ -104,28 +104,52 @@ def get_create_flashcard_styles():
 
         "name_input": """
             QLineEdit {
-                background: #FDE4E0;
+                background: #F27D72;
                 font-size: 35px;
                 font-weight: 600;
                 padding: 15px;
                 border-radius: 20px;
                 margin: 10px 5px;
-                color: #2C3E50;
+                color: white;
                 height: 60px;
-                box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
-
+                selection-background-color: #E7E7E7;
             }
             QLineEdit:focus {
-                background-color: #FFF9F9;
-            }
-            QLineEdit::placeholder {
-                color: #95A5A6;
+                background-color: #FFF9F9
+                color: #2C3E50 ;
             }
         """,
 
-        "card_frame": """
+        "card_frame_1": """
             QFrame {
-                background: #FDE4E0;
+                background: #B3D9FF;
+                border-radius: 15px;
+                padding: 20px;
+                margin: 10px 5px;
+            }
+        """,
+
+        "card_frame_2": """
+            QFrame {
+                background: #B9FBC0;
+                border-radius: 15px;
+                padding: 20px;
+                margin: 10px 5px;
+            }
+        """,
+
+        "card_frame_3": """
+            QFrame {
+                background: #FFE6A7;
+                border-radius: 15px;
+                padding: 20px;
+                margin: 10px 5px;
+            }
+        """,
+
+        "card_frame_4": """
+            QFrame {
+                background: #FFB3B3;
                 border-radius: 15px;
                 padding: 20px;
                 margin: 10px 5px;
@@ -137,7 +161,7 @@ def get_create_flashcard_styles():
                 font-size: 16px;
                 font-weight: 700;
                 color: #45B7D1;
-                padding: 5px 0;
+                padding: 1px 6px;
                 background-color: transparent;
                 border: none;
             }
@@ -146,33 +170,31 @@ def get_create_flashcard_styles():
         "question_input": """
             QLineEdit {
                 background-color: #FFFFFF;
+                border-radius: none;
+                padding: 12px 15px;
+                font-size: 14px;
+                color: #2C3E50;
+                font-weight: 500;
+                selection-background-color: #E7E7E7;
+
+            }
+        """,
+
+        "answer_input": """
+            QTextEdit {
+                background-color: #FFFFFF;
                 border-radius: 12px;
                 padding: 12px 15px;
                 font-size: 14px;
                 color: #2C3E50;
                 font-weight: 500;
+                selection-background-color: #E7E7E7;
+
             }
-            QLineEdit:focus {
+            QTextEdit:focus {
                 background-color: #FFF9F9;
             }
-            QLineEdit::placeholder {
-                color: #95A5A6;
-            }
-        ""","answer_input": """
-    QTextEdit {
-        background-color: #FFFFFF;
-        border-radius: 12px;
-        padding: 12px 15px;
-        font-size: 14px;
-        color: #2C3E50;
-        font-weight: 500;
-        border: 1px solid #E0E0E0;
-    }
-    QTextEdit:focus {
-        background-color: #FFF9F9;
-        border: 1px solid #3498DB;
-    }
-""",
+        """,
 
         "add_button": """
             QPushButton {
@@ -309,7 +331,21 @@ def get_create_flashcard_styles():
             QMessageBox QPushButton:hover {
                 background-color: #7BBFA1;
             }
-        """,           
+        ""","remove_btn":"""
+                QPushButton {
+                    background-color: #FF6B6B;
+                    color: white;
+                    border-radius: 8px;
+                    font-size: 12px;
+                    margin: 0px;
+                }
+                QPushButton:hover {
+                    background-color: #FF5252;
+                }
+                QPushButton:pressed {
+                    background-color: #FF0000;
+                }
+            """           
     }
 
 
@@ -525,7 +561,6 @@ def get_study_page_styles():
         
         "progress_bar": """
             QProgressBar {
-                border: 2px solid #45475A;
                 border-radius: 10px;
                 text-align: center;
                 background-color: #313244;
@@ -547,10 +582,12 @@ def get_study_page_styles():
         
         "card_counter": """
             QLabel {
-                color: #89B4FA;
-                font-size: 16px;
+                color: #9C9191;
+                font-size: 15px;
                 font-weight: 600;
                 background-color: transparent;
+                margin: 0px;
+                padding: 1px 6px;
             }
         """,
         
@@ -685,24 +722,24 @@ def get_study_page_styles():
         
         "card_front": """
             QFrame {
-                background-color: red;
-                border-radius: 20px;
-                padding: 40px;
+                background-color: #FDE4E0;
+                border-radius: 25px;
+                padding: 45px;
             }
         """,
         
         "card_back": """
             QFrame { 
-                background-color: blue;
-                border-radius: 20px;
-                padding: 40px;
+                background-color: #FDE4E0;
+                border-radius: 25px;
+                padding: 45px;
             }
         """,
         
         "card_text": """
             QLabel {
-                color: #CDD6F4;
-                font-size: 20px;
+                color: black;
+                font-size: 40px;
                 background-color: transparent;
             }
         """
