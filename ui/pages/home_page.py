@@ -1,4 +1,4 @@
-#ui/pages/home_page.py
+# FINAL PROJECT FLASHCARD APP / ui / pages / home_page.py
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
 from PyQt6.QtCore import Qt

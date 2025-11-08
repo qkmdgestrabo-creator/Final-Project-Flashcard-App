@@ -1,3 +1,5 @@
+# FINAL PROJECT FLASHCARD APP / ui / pages / help_page.py
+
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTextEdit, QPushButton
 
 class HelpPage(QWidget):

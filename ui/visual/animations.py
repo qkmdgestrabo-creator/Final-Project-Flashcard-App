@@ -1,4 +1,4 @@
-# ui/visual/animations.py
+# FINAL PROJECT FLASHCARD APP / ui / visual / styles / animations.py
 
 from PyQt6.QtCore import QPropertyAnimation, QEasingCurve
 

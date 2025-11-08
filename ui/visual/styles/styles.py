@@ -1,3 +1,5 @@
+# FINAL PROJECT FLASHCARD APP / ui / visual / styles / styles.py
+
 
 def get_sidebar_styles():
     return {

@@ -1,4 +1,5 @@
-# core/controller.py
+# FINAL PROJECT FLASHCARD APP / core / controller.py
+
 from typing import List, Dict
 from .data_manager import DataManager
 from .flashcard_model import Flashcard, FlashcardSet

@@ -1,3 +1,6 @@
+# FINAL PROJECT FLASHCARD APP / ui / pages / setttings_page.py
+
+
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QCheckBox, 
     QSlider, QComboBox, QGroupBox

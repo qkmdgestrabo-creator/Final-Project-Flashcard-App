@@ -1,4 +1,5 @@
-# utils/path_helper.py
+# FINAL PROJECT FLASHCARD APP / utils / path_helper.py
+
 import os
 
 def get_project_root():

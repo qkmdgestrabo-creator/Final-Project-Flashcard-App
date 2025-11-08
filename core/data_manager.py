@@ -1,4 +1,6 @@
-# core/data_manager.py
+# FINAL PROJECT FLASHCARD APP / core / data_manager.py
+
+
 import json
 import os
 from typing import List, Dict

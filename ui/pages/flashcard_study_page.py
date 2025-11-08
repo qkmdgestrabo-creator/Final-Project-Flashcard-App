@@ -1,3 +1,6 @@
+# FINAL PROJECT FLASHCARD APP / ui / pages / flashcard_study_page.py
+
+
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
                             QFrame, QProgressBar, QCheckBox)
 from PyQt6.QtCore import Qt

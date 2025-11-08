@@ -1,3 +1,6 @@
+# FINAL PROJECT FLASHCARD APP / ui / pages / create_flashcard_page.py
+
+
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QTextEdit, QScrollArea, QFrame, QMessageBox
 from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve
 from PyQt6.QtGui import QPixmap

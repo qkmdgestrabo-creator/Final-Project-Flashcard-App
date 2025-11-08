@@ -1,3 +1,6 @@
+# FINAL PROJECT FLASHCARD APP / ui / pages / flashcard_study_multiple_choice_page.py
+
+
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
                             QPushButton, QMessageBox, QFrame, QButtonGroup,
                             QRadioButton, QGridLayout)

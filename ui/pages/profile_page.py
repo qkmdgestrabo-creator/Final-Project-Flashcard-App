@@ -1,3 +1,5 @@
+# FINAL PROJECT FLASHCARD APP / ui / pages / profile_page.py
+
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, 
     QLineEdit, QFormLayout, QSpinBox

@@ -1,3 +1,6 @@
+# FINAL PROJECT FLASHCARD APP / ui / pages / all_cards_page.py
+
+
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, 
                             QPushButton, QMessageBox, QFrame, QScrollArea, QGridLayout, QDialog)
 from PyQt6.QtCore import Qt, QSize

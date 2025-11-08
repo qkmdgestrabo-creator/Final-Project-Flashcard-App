@@ -1,4 +1,5 @@
-# core/flashcard_model.py
+# FINAL PROJECT FLASHCARD APP / core / flashcard_model.py
+
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List

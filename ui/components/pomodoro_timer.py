@@ -1,3 +1,6 @@
+# FINAL PROJECT FLASHCARD APP / ui / components / pomodoro_timer.py
+
+
 from PyQt6.QtCore import QTimer, QPropertyAnimation, QEasingCurve
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
                             QSpinBox, QMessageBox, QWidget, QFrame)
