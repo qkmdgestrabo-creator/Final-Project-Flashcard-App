@@ -5,67 +5,85 @@
         "cards": [
             {
                 "question": "Question 1 hatdog 123",
-                "answer": "Answer 1 betlog 78"
+                "answer": "Answer 1  78",
+                "progress": {
+                    "learned": true,
+                    "times_correct": 3,
+                    "times_wrong": 0
+                }
             },
             {
                 "question": "Question 2",
-                "answer": "asdas"
+                "answer": "asdas",
+                "progress": {
+                    "learned": true,
+                    "times_correct": 3,
+                    "times_wrong": 0
+                }
             },
             {
                 "question": "Question 2",
-                "answer": "Question 2sadas"
+                "answer": "Question 2sadas",
+                "progress": {
+                    "learned": true,
+                    "times_correct": 3,
+                    "times_wrong": 0
+                }
             },
             {
                 "question": "Question 4",
-                "answer": "Question 4asd"
+                "answer": "Question 4asd",
+                "progress": {
+                    "learned": true,
+                    "times_correct": 3,
+                    "times_wrong": 0
+                }
             }
         ]
     },
     {
-        "set_name": "222222",
-        "created_date": "2025-11-08 18:34:48",
+        "set_name": "10 Questions",
+        "created_date": "2025-11-08 19:46:02",
         "cards": [
             {
-                "question": "asdas",
-                "answer": "asd"
+                "question": "Question 1",
+                "answer": "Answer 1"
             },
             {
-                "question": "asda",
-                "answer": "dasssssas"
+                "question": "Question 2",
+                "answer": "Answer 2"
             },
             {
-                "question": "asdas",
-                "answer": "dasd"
+                "question": "Question 3",
+                "answer": "Answer 3"
             },
             {
-                "question": "asdas",
-                "answer": "dasdas"
+                "question": "Question 4",
+                "answer": "Answer 4"
             },
             {
-                "question": "dawdwadaw",
-                "answer": "asdasdas"
-            }
-        ]
-    },
-    {
-        "set_name": "dawdaw",
-        "created_date": "2025-11-08 18:35:09",
-        "cards": [
-            {
-                "question": "dawdaw",
-                "answer": "awdwa"
+                "question": "Question 5",
+                "answer": "Answer 5"
             },
             {
-                "question": "dawdaw",
-                "answer": "dawd"
+                "question": "Question 6",
+                "answer": "Answer 6"
             },
             {
-                "question": "dawd",
-                "answer": "awdaw"
+                "question": "Question 7",
+                "answer": "Answer 7"
             },
             {
-                "question": "awdaw",
-                "answer": "dawdwa"
+                "question": "Question 8",
+                "answer": "Answer 8"
+            },
+            {
+                "question": "Question 9",
+                "answer": "Answer 9"
+            },
+            {
+                "question": "Question 10",
+                "answer": "Answer 10"
             }
         ]
     }

@@ -575,6 +575,30 @@ def get_all_cards_styles():
             QMessageBox QPushButton:pressed {
                 background-color: #D87A29;
             }
+        ""","success_message_box": """
+            QMessageBox {
+                background-color: #F7FDFC;
+                border-radius: 15px;
+            }
+            QMessageBox QLabel {
+                color: #2C3E50;
+                font-size: 14px;
+                background-color: transparent;
+                font-weight: 500;
+            }
+            QMessageBox QPushButton {
+                background-color: #96CEB4;
+                color: #2C3E50;
+                font-size: 14px;
+                font-weight: 600;
+                border-radius: 12px;
+                padding: 8px 16px;
+                min-height: 35px;
+                min-width: 80px;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #7BBFA1;
+            }
         """
     }
 
@@ -992,4 +1016,341 @@ def get_existing_flashcard_styles():
                 border-radius: 8px;
             }
         """,
+    }
+    # Add this to your styles.py file
+
+def get_pomodoro_styles():
+    return {
+        # Break Overlay Styles
+        "break_overlay": """
+            BreakOverlay {
+                background-color: rgba(120, 120, 120, 0.9);
+            }
+        """,
+        
+        # Default styles (for large windows)
+        "break_label": """
+            QLabel {
+                color: #C0392B;
+                font-size: 32px;
+                font-weight: bold;
+                padding: 20px;
+                background-color: white;
+                border-radius: 15px;
+                margin: 10px;
+            }
+        """,
+        
+        "break_message": """
+            QLabel {
+                color: #2C3E50;
+                font-size: 18px;
+                font-weight: normal;
+                padding: 15px;
+                background-color: white;
+                border-radius: 10px;
+                margin: 5px;
+            }
+        """,
+        
+        "break_progress": """
+            QLabel {
+                color: #8E44AD;
+                font-size: 16px;
+                font-weight: bold;
+                padding: 10px;
+                background-color: white;
+                border-radius: 8px;
+                margin: 5px;
+            }
+        """,
+        
+        "break_timer": """
+            QLabel {
+                color: #C0392B;
+                font-size: 48px;
+                font-weight: bold;
+                font-family: 'Monospace';
+                padding: 25px;
+                background-color: white;
+                border-radius: 15px;
+                margin: 15px;
+            }
+        """,
+        
+        "break_instruction": """
+            QLabel {
+                color: #2C3E50;
+                font-size: 14px;
+                padding: 12px;
+                background-color: white;
+                border-radius: 8px;
+                margin: 5px;
+            }
+        """,
+        
+        # Small window styles (600-800px)
+        "break_label_small": """
+            QLabel {
+                color: #C0392B;
+                font-size: 24px;
+                font-weight: bold;
+                padding: 15px;
+                background-color: white;
+                border-radius: 15px;
+                margin: 8px;
+            }
+        """,
+        
+        "break_message_small": """
+            QLabel {
+                color: #2C3E50;
+                font-size: 16px;
+                font-weight: normal;
+                padding: 12px;
+                background-color: white;
+                border-radius: 10px;
+                margin: 4px;
+            }
+        """,
+        
+        "break_progress_small": """
+            QLabel {
+                color: #8E44AD;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 8px;
+                background-color: white;
+                border-radius: 8px;
+                margin: 4px;
+            }
+        """,
+        
+        "break_timer_small": """
+            QLabel {
+                color: #C0392B;
+                font-size: 36px;
+                font-weight: bold;
+                font-family: 'Monospace';
+                padding: 20px;
+                background-color: white;
+                border-radius: 15px;
+                margin: 12px;
+            }
+        """,
+        
+        "break_instruction_small": """
+            QLabel {
+                color: #2C3E50;
+                font-size: 12px;
+                padding: 10px;
+                background-color: white;
+                border-radius: 8px;
+                margin: 4px;
+            }
+        """,
+        
+        # Very small window styles (<600px)
+        "break_label_xsmall": """
+            QLabel {
+                color: #C0392B;
+                font-size: 20px;
+                font-weight: bold;
+                padding: 12px;
+                background-color: white;
+                border-radius: 15px;
+                margin: 6px;
+            }
+        """,
+        
+        "break_message_xsmall": """
+            QLabel {
+                color: #2C3E50;
+                font-size: 14px;
+                font-weight: normal;
+                padding: 10px;
+                background-color: white;
+                border-radius: 10px;
+                margin: 3px;
+            }
+        """,
+        
+        "break_progress_xsmall": """
+            QLabel {
+                color: #8E44AD;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 6px;
+                background-color: white;
+                border-radius: 8px;
+                margin: 3px;
+            }
+        """,
+        
+        "break_timer_xsmall": """
+            QLabel {
+                color: #C0392B;
+                font-size: 28px;
+                font-weight: bold;
+                font-family: 'Monospace';
+                padding: 15px;
+                background-color: white;
+                border-radius: 15px;
+                margin: 8px;
+            }
+        """,
+        
+        "break_instruction_xsmall": """
+            QLabel {
+                color: #2C3E50;
+                font-size: 11px;
+                padding: 8px;
+                background-color: white;
+                border-radius: 8px;
+                margin: 3px;
+            }
+        """,
+        
+        # Timer Button States
+        "timer_button_forced_break": """
+            QPushButton {
+                background-color: #95A5A6;
+                color: #2C3E50;
+                border: 2px solid #7F8C8D;
+                border-radius: 15px;
+                font-weight: bold;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            QPushButton:disabled {
+                background-color: #BDC3C7;
+                color: #7F8C8D;
+            }
+        """,
+        
+        "timer_button_running": """
+            QPushButton {
+                background-color: #E74C3C;
+                color: white;
+                border: 2px solid #C0392B;
+                border-radius: 15px;
+                font-weight: bold;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #C0392B;
+            }
+        """,
+        
+        "timer_button_stopped": """
+            QPushButton {
+                background-color: #27AE60;
+                color: white;
+                border: 2px solid #229954;
+                border-radius: 15px;
+                font-weight: bold;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #229954;
+            }
+        """,
+        
+        # Settings Dialog Styles
+        "settings_dialog": """
+            QDialog {
+                background-color: #ECF0F1;
+                border: 3px solid #34495E;
+                border-radius: 15px;
+            }
+            QWidget {
+                background-color: #ECF0F1;
+            }
+        """,
+        
+        "settings_label": """
+            QLabel {
+                color: #2C3E50;
+                font-size: 14px;
+                font-weight: bold;
+                padding: 8px;
+                background-color: #FFFFFF;
+                border-radius: 5px;
+            }
+        """,
+        
+        "spin_box": """
+            QSpinBox {
+                background-color: white;
+                border-radius: 8px;
+                padding: 8px;
+                font-size: 14px;
+                color: #2C3E50;
+                font-weight: bold;
+                min-width: 80px;
+            }
+            QSpinBox:focus {
+                border: 3px solid #E74C3C;
+                background-color: #FFF8E1;
+            }
+            QSpinBox::up-button {
+                background-color: #3498DB;
+                border-radius: 3px;
+                width: 20px;
+            }
+            QSpinBox::down-button {
+                background-color: #3498DB;
+                border-radius: 3px;
+                width: 20px;
+            }
+            QSpinBox::up-arrow {
+                color: white;
+            }
+            QSpinBox::down-arrow {
+                color: white;
+            }
+        """,
+        
+        "settings_info": """
+            QLabel {
+                color: #E74C3C;
+                font-size: 12px;
+                font-weight: bold;
+                background-color: #FFF8E1;
+                padding: 12px;
+                border-radius: 8px;
+            }
+        """,
+        
+        "save_button": """
+            QPushButton {
+                background-color: #27AE60;
+                color: white;
+                border-radius: 10px;
+                font-weight: bold;
+                padding: 10px 25px;
+                font-size: 14px;
+                min-width: 80px;
+            }
+            QPushButton:hover {
+                background-color: #229954;
+            }
+        """,
+        
+        "cancel_button": """
+            QPushButton {
+                background-color: #E74C3C;
+                color: white;
+                border-radius: 10px;
+                font-weight: bold;
+                padding: 10px 25px;
+                font-size: 14px;
+                min-width: 80px;
+            }
+            QPushButton:hover {
+                background-color: #C0392B;
+            }
+        """
     }

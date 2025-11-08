@@ -4,42 +4,39 @@ from PyQt6.QtCore import QTimer, QPropertyAnimation, QEasingCurve
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
                             QSpinBox, QMessageBox, QWidget, QFrame)
 from PyQt6.QtGui import QFont
-from PyQt6.QtCore import Qt, pyqtProperty
+from PyQt6.QtCore import Qt, pyqtProperty, QEvent
+from ui.visual.styles.styles import get_pomodoro_styles
 
 class BreakOverlay(QWidget):
     def __init__(self, parent, session_info):
         super().__init__(parent)
         self.session_info = session_info
+        self.styles = get_pomodoro_styles()
         self.setup_ui()
         
+        # Install event filter on parent to track movement
+        if parent:
+            parent.installEventFilter(self)
+        
     def setup_ui(self):
-        # Cover the entire parent window
-        self.setGeometry(0, 0, self.parent().width(), self.parent().height())
+        # Make it a normal child widget
+        self.setWindowFlags(Qt.WindowType.Widget)
         
-        # Semi-transparent dark background
-        self.setStyleSheet("""
-            BreakOverlay {
-                background-color: rgba(0, 0, 0, 0.85);
-            }
-        """)
+        # Apply the light grey overlay style
+        self.setStyleSheet(self.styles["break_overlay"])
         
-        layout = QVBoxLayout()
+        # Main layout
+        layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.setSpacing(30)
+        layout.setSpacing(15)
+        layout.setContentsMargins(20, 20, 20, 20)
         
-        # Main break message
-        break_label = QLabel("🌿 BREAK TIME 🌿")
-        break_label.setStyleSheet("""
-            QLabel {
-                color: #A6E3A1;
-                font-size: 32px;
-                font-weight: bold;
-                padding: 20px;
-            }
-        """)
+        # Create all labels
+        break_label = QLabel("BREAK TIME")
+        break_label.setStyleSheet(self.styles["break_label"])
         break_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        break_label.setWordWrap(True)
         
-        # Encouraging message
         messages = [
             "You're doing great! Your brain needs this rest.",
             "Well done! Taking breaks improves memory retention.",
@@ -51,78 +48,33 @@ class BreakOverlay(QWidget):
         message = random.choice(messages)
         
         message_label = QLabel(message)
-        message_label.setStyleSheet("""
-            QLabel {
-                color: #F9E2AF;
-                font-size: 18px;
-                font-weight: normal;
-                padding: 15px;
-            }
-        """)
+        message_label.setStyleSheet(self.styles["break_message"])
         message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         message_label.setWordWrap(True)
         
-        # RESPONSIVE SIZING - 60% of screen width for message      ganito dapat sizing wag fixed para applicable for all screensizes
-        if self.parent():
-            screen = self.parent().screen()
-            screen_size = screen.availableGeometry()
-            message_label.setMaximumWidth(int(screen_size.width() * 0.6))
-        else:
-            message_label.setMaximumWidth(500)
-        
-        # Session progress
         progress_label = QLabel(f"Session {self.session_info} completed!")
-        progress_label.setStyleSheet("""
-            QLabel {
-                color: #CBA6F7;
-                font-size: 16px;
-                font-weight: bold;
-                padding: 10px;
-            }
-        """)
+        progress_label.setStyleSheet(self.styles["break_progress"])
         progress_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        progress_label.setWordWrap(True)
         
-        # Timer display in overlay
         self.timer_label = QLabel("05:00")
-        self.timer_label.setStyleSheet("""
-            QLabel {
-                color: #F38BA8;
-                font-size: 48px;
-                font-weight: bold;
-                font-family: 'Monospace';
-                padding: 20px;
-                background-color: rgba(30, 30, 46, 0.7);
-                border-radius: 15px;
-            }
-        """)
+        self.timer_label.setStyleSheet(self.styles["break_timer"])
         self.timer_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        # RESPONSIVE SIZING - 20% of screen width for timer
-        if self.parent():
-            screen = self.parent().screen()
-            screen_size = screen.availableGeometry()
-            self.timer_label.setMinimumWidth(int(screen_size.width() * 0.2))
-        else:
-            self.timer_label.setMinimumWidth(200)
-        
-        # Instruction
-        instruction_label = QLabel("Relax... The timer will automatically continue when break is over")
-        instruction_label.setStyleSheet("""
-            QLabel {
-                color: #6C7086;
-                font-size: 14px;
-                padding: 10px;
-            }
-        """)
+        instruction_label = QLabel("Break in progress... Timer will auto-continue")
+        instruction_label.setStyleSheet(self.styles["break_instruction"])
         instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        instruction_label.setWordWrap(True)
         
+        # Add all widgets to layout
         layout.addWidget(break_label)
         layout.addWidget(message_label)
         layout.addWidget(progress_label)
         layout.addWidget(self.timer_label)
         layout.addWidget(instruction_label)
         
-        self.setLayout(layout)
+        # Set initial position
+        self.update_position()
         
         # Fade in animation
         self.animation = QPropertyAnimation(self, b"windowOpacity")
@@ -132,25 +84,45 @@ class BreakOverlay(QWidget):
         self.animation.setEasingCurve(QEasingCurve.Type.OutCubic)
         self.animation.start()
     
+    def update_position(self):
+        """Update to cover parent area"""
+        if self.parent():
+            # Always position at (0, 0) relative to parent and match size
+            self.move(0, 0)
+            self.resize(self.parent().width(), self.parent().height())
+    
     def update_timer(self, minutes, seconds):
         self.timer_label.setText(f"{minutes:02d}:{seconds:02d}")
     
+    def eventFilter(self, obj, event):
+        """Track parent window movement and resizing"""
+        if obj == self.parent():
+            if event.type() in [QEvent.Type.Move, QEvent.Type.Resize]:
+                self.update_position()
+        return super().eventFilter(obj, event)
+    
     def resizeEvent(self, event):
-        # Always cover the entire parent window
-        self.setGeometry(0, 0, self.parent().width(), self.parent().height())
+        """Update when parent resizes"""
+        self.update_position()
         super().resizeEvent(event)
+    
+    def showEvent(self, event):
+        """Ensure proper positioning when shown"""
+        self.update_position()
+        super().showEvent(event)
 
 class PomodoroTimer:
     def __init__(self, main_window):
         self.main_window = main_window
+        self.styles = get_pomodoro_styles()
         self.time_remaining = 0
         self.timer_running = False
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_timer)
         
-        # Session settings (user customizable)
-        self.study_time = 25  # minutes
-        self.break_time = 5   # minutes
+        # Session settings
+        self.study_time = 25
+        self.break_time = 5
         self.total_sessions = 4
         self.current_session = 0
         
@@ -159,13 +131,18 @@ class PomodoroTimer:
         self.forced_break_mode = False
         self.sessions_completed = 0
         self.break_overlay = None
+        
+        # Initialize with study time
+        self.time_remaining = self.study_time * 60
     
     def start_timer(self):
         if not self.timer_running and not self.forced_break_mode:
-            if self.time_remaining == 0:
-                # First start - initialize timer
-                self.time_remaining = self.study_time * 60
-                self.current_session = 1
+            if self.time_remaining <= 0:
+                if not self.is_break_time:
+                    self.time_remaining = self.study_time * 60
+                    if self.current_session == 0:
+                        self.current_session = 1
+            
             self.timer_running = True
             self.timer.start(1000)
             self.update_display()
@@ -173,7 +150,6 @@ class PomodoroTimer:
         return False
     
     def pause_timer(self):
-        # CANNOT pause during forced breaks
         if self.timer_running and not self.forced_break_mode:
             self.timer_running = False
             self.timer.stop()
@@ -182,16 +158,16 @@ class PomodoroTimer:
         return False
     
     def reset_timer(self):
-        # CANNOT reset during forced breaks
         if not self.forced_break_mode:
             self.timer_running = False
             self.timer.stop()
-            self.time_remaining = 0
+            self.time_remaining = self.study_time * 60
             self.is_break_time = False
             self.forced_break_mode = False
             self.current_session = 0
             self.sessions_completed = 0
             self.remove_break_overlay()
+            self.restore_window_resize()
             self.update_display()
             return True
         return False
@@ -201,7 +177,6 @@ class PomodoroTimer:
             self.time_remaining -= 1
             self.update_display()
             
-            # Update overlay timer if it exists
             if self.break_overlay:
                 minutes = self.time_remaining // 60
                 seconds = self.time_remaining % 60
@@ -215,84 +190,64 @@ class PomodoroTimer:
         
         if self.forced_break_mode:
             status = "FORCED BREAK"
-            color = "#F9E2AF"  # Yellow for forced break
         else:
             status = "Break" if self.is_break_time else "Study"
-            color = "#A6E3A1"  # Green for normal mode
         
-        # Add session info to display
         session_info = f" ({self.current_session}/{self.total_sessions})"
         display_text = f"{status}{session_info}: {minutes:02d}:{seconds:02d}"
-        self.main_window.update_timer_display(display_text)
         
-        # Update button states based on forced break mode
+        if hasattr(self.main_window, 'update_timer_display'):
+            self.main_window.update_timer_display(display_text)
+        
         self.update_button_states()
     
     def update_button_states(self):
         if hasattr(self.main_window, 'pomodoro_btn'):
             if self.forced_break_mode:
-                # FORCED BREAK: Disable all controls
                 self.main_window.pomodoro_btn.setEnabled(False)
                 self.main_window.pomodoro_btn.setText("⏸ Forced Break")
-                self.main_window.pomodoro_btn.setStyleSheet("""
-                    QPushButton {
-                        background-color: #585B70;
-                        color: #CDD6F4;
-                        border: none;
-                        border-radius: 15px;
-                        font-weight: bold;
-                        padding: 5px;
-                    }
-                """)
+                self.main_window.pomodoro_btn.setStyleSheet(self.styles["timer_button_forced_break"])
                 
-                # Also disable settings button during forced break
                 if hasattr(self.main_window, 'timer_settings_btn'):
                     self.main_window.timer_settings_btn.setEnabled(False)
-                    
             else:
-                # NORMAL MODE: Enable controls
                 self.main_window.pomodoro_btn.setEnabled(True)
                 if hasattr(self.main_window, 'timer_settings_btn'):
                     self.main_window.timer_settings_btn.setEnabled(True)
                     
                 if self.timer_running:
                     self.main_window.pomodoro_btn.setText("⏸ Pause")
-                    self.main_window.pomodoro_btn.setStyleSheet("""
-                        QPushButton {
-                            background-color: #F38BA8;
-                            color: #1E1E2E;
-                            border: none;
-                            border-radius: 15px;
-                            font-weight: bold;
-                            padding: 5px;
-                        }
-                    """)
+                    self.main_window.pomodoro_btn.setStyleSheet(self.styles["timer_button_running"])
                 else:
                     self.main_window.pomodoro_btn.setText("▶ Start")
-                    self.main_window.pomodoro_btn.setStyleSheet("""
-                        QPushButton {
-                            background-color: #A6E3A1;
-                            color: #1E1E2E;
-                            border: none;
-                            border-radius: 15px;
-                            font-weight: bold;
-                            padding: 5px;
-                        }
-                    """)
-    
+                    self.main_window.pomodoro_btn.setStyleSheet(self.styles["timer_button_stopped"])
+
     def show_break_overlay(self):
-        # Show the full-screen break overlay
+        """Show overlay as a child widget"""
+        self.remove_break_overlay()
+        
         session_info = f"{self.current_session}/{self.total_sessions}"
         self.break_overlay = BreakOverlay(self.main_window, session_info)
         self.break_overlay.show()
-        self.break_overlay.raise_()
     
     def remove_break_overlay(self):
-        # Remove the break overlay
         if self.break_overlay:
             self.break_overlay.deleteLater()
             self.break_overlay = None
     
+    def enforce_forced_break(self):
+        """Make window non-resizable during break"""
+        if hasattr(self.main_window, 'setFixedSize'):
+            current_size = self.main_window.size()
+            self.main_window.setFixedSize(current_size)
+
+    def restore_window_resize(self):
+        """Allow window resizing again after break"""
+        if hasattr(self.main_window, 'setMinimumSize'):
+            self.main_window.setMinimumSize(400, 300)
+        if hasattr(self.main_window, 'setMaximumSize'):
+            self.main_window.setMaximumSize(16777215, 16777215)
+
     def timer_finished(self):
         self.timer_running = False
         self.timer.stop()
@@ -301,58 +256,62 @@ class PomodoroTimer:
             # STUDY TIME FINISHED - START FORCED BREAK
             self.sessions_completed += 1
             self.is_break_time = True
-            self.forced_break_mode = True  # THIS IS THE FORCE BREAK!
+            self.forced_break_mode = True
             self.time_remaining = self.break_time * 60
             
-            # Show break overlay (covers entire screen)
-            self.show_break_overlay()
+            # ENFORCE non-resizable window
+            self.enforce_forced_break()
             
-            # AUTO-START the forced break (user cannot stop this!)
+            self.show_break_overlay()
             self.timer_running = True
             self.timer.start(1000)
             
         else:
-            # BREAK TIME FINISHED - Check if we have more sessions
+            # BREAK TIME FINISHED
             self.is_break_time = False
-            self.forced_break_mode = False  # End forced break
+            self.forced_break_mode = False
             
-            # Remove the break overlay
+            # RESTORE window resizing
+            self.restore_window_resize()
+            
             self.remove_break_overlay()
             
             if self.current_session < self.total_sessions:
-                # More sessions remaining
                 self.current_session += 1
                 self.time_remaining = self.study_time * 60
                 
                 QMessageBox.information(self.main_window, "Break Complete!", 
-                                      f"Ready for session {self.current_session}/{self.total_sessions}?")
+                                    f"Starting session {self.current_session}/{self.total_sessions} now!")
+                
+                self.timer_running = True
+                self.timer.start(1000)
+                self.update_display()
+                
             else:
-                # All sessions completed!
                 self.time_remaining = 0
                 self.current_session = 0
                 self.sessions_completed = 0
                 
                 QMessageBox.information(self.main_window, "All Sessions Complete!", 
-                                      f"Congratulations! You completed all {self.total_sessions} sessions! 🎉")
-        
-        self.update_display()
+                                    f"Congratulations! You completed all {self.total_sessions} sessions! 🎉")
+                self.update_display()
     
     def set_times(self, study_time, break_time, sessions):
-        # Can only change settings when not in forced break
         if not self.forced_break_mode:
             self.study_time = study_time
             self.break_time = break_time
             self.total_sessions = sessions
+            
             if not self.timer_running:
-                self.time_remaining = self.study_time * 60
-                self.current_session = 0
-                self.sessions_completed = 0
+                if not self.is_break_time:
+                    self.time_remaining = self.study_time * 60
+                else:
+                    self.time_remaining = self.break_time * 60
                 self.update_display()
             return True
         return False
     
     def show_settings(self, parent_widget):
-        # Show settings dialog - disabled during forced breaks
         if self.forced_break_mode:
             QMessageBox.warning(parent_widget, "Settings Locked", 
                               "Cannot change settings during forced break!\n"
@@ -372,68 +331,105 @@ class PomodoroTimer:
             )
         return False
 
-
 class PomodoroSettings(QDialog):
     def __init__(self, parent):
         super().__init__(parent)
+        self.styles = get_pomodoro_styles()
         self.setup_ui()
     
     def setup_ui(self):
         self.setWindowTitle("Timer Settings")
         
-        # RESPONSIVE SIZING - 20% of screen size
+        # Apply dialog style first
+        self.setStyleSheet(self.styles["settings_dialog"])
+        
+        # RESPONSIVE SIZING - Use percentage of screen size
         if self.parent():
             screen = self.parent().screen()
             screen_size = screen.availableGeometry()
-            dialog_width = int(screen_size.width() * 0.2)
-            dialog_height = int(screen_size.height() * 0.2)
+            dialog_width = int(screen_size.width() * 0.25)
+            dialog_height = int(screen_size.height() * 0.3)
             self.setMinimumSize(dialog_width, dialog_height)
         else:
-            self.setMinimumSize(350, 250)  # Fallback
+            self.setMinimumSize(400, 300)
         
+        # Main layout with proper spacing
         layout = QVBoxLayout()
+        layout.setSpacing(20)
+        layout.setContentsMargins(25, 25, 25, 25)
         
         # Study time
         study_layout = QHBoxLayout()
-        study_layout.addWidget(QLabel("Study Time (min):"))
+        study_label = QLabel("Study Time (minutes):")
+        study_label.setStyleSheet(self.styles["settings_label"])
+        study_layout.addWidget(study_label)
+        
+        study_layout.addStretch()
+        
         self.study_spin = QSpinBox()
+        self.study_spin.setStyleSheet(self.styles["spin_box"])
         self.study_spin.setRange(1, 60)
         self.study_spin.setValue(25)
+        self.study_spin.setSuffix(" min")
         study_layout.addWidget(self.study_spin)
         layout.addLayout(study_layout)
         
         # Break time
         break_layout = QHBoxLayout()
-        break_layout.addWidget(QLabel("Break Time (min):"))
+        break_label = QLabel("Break Time (minutes):")
+        break_label.setStyleSheet(self.styles["settings_label"])
+        break_layout.addWidget(break_label)
+        
+        break_layout.addStretch()
+        
         self.break_spin = QSpinBox()
+        self.break_spin.setStyleSheet(self.styles["spin_box"])
         self.break_spin.setRange(1, 30)
         self.break_spin.setValue(5)
+        self.break_spin.setSuffix(" min")
         break_layout.addWidget(self.break_spin)
         layout.addLayout(break_layout)
         
         # Sessions
         sessions_layout = QHBoxLayout()
-        sessions_layout.addWidget(QLabel("Sessions:"))
+        sessions_label = QLabel("Number of Sessions:")
+        sessions_label.setStyleSheet(self.styles["settings_label"])
+        sessions_layout.addWidget(sessions_label)
+        
+        sessions_layout.addStretch()
+        
         self.sessions_spin = QSpinBox()
+        self.sessions_spin.setStyleSheet(self.styles["spin_box"])
         self.sessions_spin.setRange(1, 10)
         self.sessions_spin.setValue(4)
         sessions_layout.addWidget(self.sessions_spin)
         layout.addLayout(sessions_layout)
         
         # Info label
-        info_label = QLabel("Note: All breaks between sessions are forced for your well-being.")
-        info_label.setStyleSheet("color: #6C7086; font-size: 10px;")
+        info_label = QLabel("💡 Note: All breaks between sessions are forced for your well-being and focus.")
+        info_label.setStyleSheet(self.styles["settings_info"])
         info_label.setWordWrap(True)
+        info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(info_label)
         
-        # Buttons
+        # Buttons with proper spacing
         button_layout = QHBoxLayout()
-        save_btn = QPushButton("Save")
+        button_layout.setSpacing(20)
+        button_layout.setContentsMargins(0, 20, 0, 0)
+        
+        save_btn = QPushButton("💾 Save")
+        save_btn.setStyleSheet(self.styles["save_button"])
         save_btn.clicked.connect(self.accept)
-        cancel_btn = QPushButton("Cancel")
+        
+        cancel_btn = QPushButton("❌ Cancel")
+        cancel_btn.setStyleSheet(self.styles["cancel_button"])
         cancel_btn.clicked.connect(self.reject)
+        
+        button_layout.addStretch()
         button_layout.addWidget(save_btn)
         button_layout.addWidget(cancel_btn)
+        button_layout.addStretch()
+        
         layout.addLayout(button_layout)
         
         self.setLayout(layout)

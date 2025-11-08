@@ -371,5 +371,25 @@ class AllCards(QWidget):
             if error_message:
                 QMessageBox.critical(self, "Delete Error", f"Failed to delete set:\n{error_message}")
             else:
-                QMessageBox.information(self, "Success", f"Flashcard set '{set_name}' deleted successfully!")
+                # SUCCESS MESSAGE WITH CUSTOM ICON
+                success_msg_box = QMessageBox(self)
+                success_msg_box.setWindowTitle("Success")
+                success_msg_box.setText(f"Flashcard set '{set_name}' deleted successfully!")
+                
+                # Add custom success icon
+                success_icon_path = get_asset_path("success.png")  # Make sure you have a success icon
+                if success_icon_path:
+                    success_icon = QPixmap(success_icon_path)
+                    if not success_icon.isNull():
+                        # RESPONSIVE ICON SCALING - 5% of screen size
+                        screen = self.main_window.screen()
+                        screen_size = screen.availableGeometry()
+                        icon_size = int(min(screen_size.width(), screen_size.height()) * 0.05)  # 5% of screen
+                        success_msg_box.setIconPixmap(success_icon.scaled(icon_size, icon_size, Qt.AspectRatioMode.KeepAspectRatio))
+                
+                # Set style and button
+                success_msg_box.setStyleSheet(self.styles["success_message_box"])  # Make sure you have this style
+                success_msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+                
+                success_msg_box.exec()
                 self.load_flashcards()
