@@ -2,28 +2,30 @@
 
 from PyQt6.QtCore import QTimer, QPropertyAnimation, QEasingCurve
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
-                            QSpinBox, QMessageBox, QWidget, QFrame)
-from PyQt6.QtGui import QFont
+                            QSpinBox, QMessageBox, QWidget, QFrame, QSizePolicy)
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt, pyqtProperty, QEvent
 from ui.visual.styles.styles import get_pomodoro_styles
+from utils.path_helper import get_asset_path 
 
 class BreakOverlay(QWidget):
-    def __init__(self, parent, session_info):
+    def __init__(self, parent, session_info, break_time_minutes):
         super().__init__(parent)
         self.session_info = session_info
+        self.break_time_minutes = break_time_minutes
         self.styles = get_pomodoro_styles()
         self.setup_ui()
         
-        # Install event filter on parent to track movement
-        if parent:
-            parent.installEventFilter(self)
-        
     def setup_ui(self):
-        # Make it a normal child widget
+        # CRITICAL: Ensure this widget is on top of everything
         self.setWindowFlags(Qt.WindowType.Widget)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         
-        # Apply the light grey overlay style
+        # Use your existing style
         self.setStyleSheet(self.styles["break_overlay"])
+        
+        # CRITICAL: Make it fill available space
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         
         # Main layout
         layout = QVBoxLayout(self)
@@ -31,12 +33,40 @@ class BreakOverlay(QWidget):
         layout.setSpacing(15)
         layout.setContentsMargins(20, 20, 20, 20)
         
-        # Create all labels
-        break_label = QLabel("BREAK TIME")
-        break_label.setStyleSheet(self.styles["break_label"])
+        # Create break image label
+        break_label = QLabel()
+        image_path = get_asset_path("break.png") 
+        pixmap = QPixmap(image_path)
+
+        # RESPONSIVE IMAGE SCALING - maintain original aspect ratio
+        if self.parent():
+            screen = self.parent().screen()
+            screen_size = screen.availableGeometry()
+            max_width = int(screen_size.width() * 0.15)  # Maximum 15% of screen width
+            
+            # Get original image size
+            original_width = pixmap.width()
+            original_height = pixmap.height()
+            
+            # Calculate proportional height based on original aspect ratio
+            if original_width > 0 and original_height > 0:
+                aspect_ratio = original_height / original_width
+                calculated_height = int(max_width * aspect_ratio)
+                
+                # Scale while maintaining aspect ratio
+                pixmap = pixmap.scaled(max_width, calculated_height, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            else:
+                # Fallback if image dimensions are invalid
+                pixmap = pixmap.scaled(max_width, 150, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        else:
+            # Default scaling
+            pixmap = pixmap.scaled(400, 200, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+        break_label.setPixmap(pixmap)
         break_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        break_label.setWordWrap(True)
-        
+        break_label.setScaledContents(False)  # Changed to False to prevent additional scaling
+        break_label.setStyleSheet(self.styles["break_label"])
+
         messages = [
             "You're doing great! Your brain needs this rest.",
             "Well done! Taking breaks improves memory retention.",
@@ -52,28 +82,24 @@ class BreakOverlay(QWidget):
         message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         message_label.setWordWrap(True)
         
-        progress_label = QLabel(f"Session {self.session_info} completed!")
+        progress_label = QLabel(f"Session {self.session_info}")
         progress_label.setStyleSheet(self.styles["break_progress"])
         progress_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         progress_label.setWordWrap(True)
         
-        self.timer_label = QLabel("05:00")
+        self.timer_label = QLabel(f"{self.break_time_minutes:02d}:00")
         self.timer_label.setStyleSheet(self.styles["break_timer"])
         self.timer_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        instruction_label = QLabel("Break in progress... Timer will auto-continue")
-        instruction_label.setStyleSheet(self.styles["break_instruction"])
-        instruction_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        instruction_label.setWordWrap(True)
+   
         
         # Add all widgets to layout
         layout.addWidget(break_label)
+        layout.addWidget(self.timer_label)
         layout.addWidget(message_label)
         layout.addWidget(progress_label)
-        layout.addWidget(self.timer_label)
-        layout.addWidget(instruction_label)
         
-        # Set initial position
+        # Position and size to cover parent
         self.update_position()
         
         # Fade in animation
@@ -85,21 +111,11 @@ class BreakOverlay(QWidget):
         self.animation.start()
     
     def update_position(self):
-        """Update to cover parent area"""
+        """Update to cover parent area completely"""
         if self.parent():
-            # Always position at (0, 0) relative to parent and match size
-            self.move(0, 0)
-            self.resize(self.parent().width(), self.parent().height())
-    
-    def update_timer(self, minutes, seconds):
-        self.timer_label.setText(f"{minutes:02d}:{seconds:02d}")
-    
-    def eventFilter(self, obj, event):
-        """Track parent window movement and resizing"""
-        if obj == self.parent():
-            if event.type() in [QEvent.Type.Move, QEvent.Type.Resize]:
-                self.update_position()
-        return super().eventFilter(obj, event)
+            # Cover the entire parent widget
+            self.setGeometry(0, 0, self.parent().width(), self.parent().height())
+            self.raise_()  # Bring to front
     
     def resizeEvent(self, event):
         """Update when parent resizes"""
@@ -110,6 +126,9 @@ class BreakOverlay(QWidget):
         """Ensure proper positioning when shown"""
         self.update_position()
         super().showEvent(event)
+    
+    def update_timer(self, minutes, seconds):
+        self.timer_label.setText(f"{minutes:02d}:{seconds:02d}")
 
 class PomodoroTimer:
     def __init__(self, main_window):
@@ -122,7 +141,7 @@ class PomodoroTimer:
         
         # Session settings
         self.study_time = 25
-        self.break_time = 5
+        self.break_time = 10
         self.total_sessions = 4
         self.current_session = 0
         
@@ -134,6 +153,29 @@ class PomodoroTimer:
         
         # Initialize with study time
         self.time_remaining = self.study_time * 60
+
+    def show_custom_message(self, title, message, icon_name):
+        """Show custom message dialog with custom icon"""
+        msg_box = QMessageBox(self.main_window)
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+
+        msg_box.setStyleSheet(self.styles["warning_message_box"])
+
+        
+        # Set custom icon
+        icon_path = get_asset_path(icon_name)
+        pixmap = QPixmap(icon_path)
+        if not pixmap.isNull():
+            # RESPONSIVE ICON SCALING
+            screen = self.main_window.screen()
+            screen_size = screen.availableGeometry()
+            icon_size = int(min(screen_size.width(), screen_size.height()) * 0.06)  # 6% of screen
+            scaled_pixmap = pixmap.scaled(icon_size, icon_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            msg_box.setIconPixmap(scaled_pixmap)
+        
+        msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        msg_box.exec()
     
     def start_timer(self):
         if not self.timer_running and not self.forced_break_mode:
@@ -223,12 +265,21 @@ class PomodoroTimer:
                     self.main_window.pomodoro_btn.setStyleSheet(self.styles["timer_button_stopped"])
 
     def show_break_overlay(self):
-        """Show overlay as a child widget"""
+        """Show overlay as a child widget that covers the main window"""
         self.remove_break_overlay()
         
         session_info = f"{self.current_session}/{self.total_sessions}"
-        self.break_overlay = BreakOverlay(self.main_window, session_info)
+        self.break_overlay = BreakOverlay(self.main_window, session_info, self.break_time)
+        
+        # UPDATE THE OVERLAY TIMER IMMEDIATELY WITH CURRENT TIME
+        minutes = self.time_remaining // 60
+        seconds = self.time_remaining % 60
+        self.break_overlay.update_timer(minutes, seconds)
+        
+        # CRITICAL: Add directly to main window and ensure it's on top
+        self.break_overlay.setParent(self.main_window)
         self.break_overlay.show()
+        self.break_overlay.raise_()
     
     def remove_break_overlay(self):
         if self.break_overlay:
@@ -280,8 +331,12 @@ class PomodoroTimer:
                 self.current_session += 1
                 self.time_remaining = self.study_time * 60
                 
-                QMessageBox.information(self.main_window, "Break Complete!", 
-                                    f"Starting session {self.current_session}/{self.total_sessions} now!")
+                # Use custom message with icon
+                self.show_custom_message(
+                    "Break Complete!", 
+                    f"Start session {self.current_session}/{self.total_sessions} now!",
+                    "success.png"  # Your custom icon file
+                )
                 
                 self.timer_running = True
                 self.timer.start(1000)
@@ -292,8 +347,12 @@ class PomodoroTimer:
                 self.current_session = 0
                 self.sessions_completed = 0
                 
-                QMessageBox.information(self.main_window, "All Sessions Complete!", 
-                                    f"Congratulations! You completed all {self.total_sessions} sessions! 🎉")
+                # Use custom message with icon
+                self.show_custom_message(
+                    "All Sessions Complete!", 
+                    f"Congratulations! You completed all {self.total_sessions} sessions! ",
+                    "congrats.png"  # Your custom icon file
+                )
                 self.update_display()
     
     def set_times(self, study_time, break_time, sessions):
@@ -360,7 +419,7 @@ class PomodoroSettings(QDialog):
         
         # Study time
         study_layout = QHBoxLayout()
-        study_label = QLabel("Study Time (minutes):")
+        study_label = QLabel("Study Time:")
         study_label.setStyleSheet(self.styles["settings_label"])
         study_layout.addWidget(study_label)
         
@@ -376,7 +435,7 @@ class PomodoroSettings(QDialog):
         
         # Break time
         break_layout = QHBoxLayout()
-        break_label = QLabel("Break Time (minutes):")
+        break_label = QLabel("Break Time:")
         break_label.setStyleSheet(self.styles["settings_label"])
         break_layout.addWidget(break_label)
         

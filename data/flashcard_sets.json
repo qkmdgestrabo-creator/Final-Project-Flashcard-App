@@ -1,47 +1,5 @@
 [
     {
-        "set_name": "Sample",
-        "created_date": "2025-11-08 18:31:28",
-        "cards": [
-            {
-                "question": "Question 1 hatdog 123",
-                "answer": "Answer 1  78",
-                "progress": {
-                    "learned": true,
-                    "times_correct": 3,
-                    "times_wrong": 0
-                }
-            },
-            {
-                "question": "Question 2",
-                "answer": "asdas",
-                "progress": {
-                    "learned": true,
-                    "times_correct": 3,
-                    "times_wrong": 0
-                }
-            },
-            {
-                "question": "Question 2",
-                "answer": "Question 2sadas",
-                "progress": {
-                    "learned": true,
-                    "times_correct": 3,
-                    "times_wrong": 0
-                }
-            },
-            {
-                "question": "Question 4",
-                "answer": "Question 4asd",
-                "progress": {
-                    "learned": true,
-                    "times_correct": 3,
-                    "times_wrong": 0
-                }
-            }
-        ]
-    },
-    {
         "set_name": "10 Questions",
         "created_date": "2025-11-08 19:46:02",
         "cards": [
@@ -84,6 +42,28 @@
             {
                 "question": "Question 10",
                 "answer": "Answer 10"
+            }
+        ]
+    },
+    {
+        "set_name": "Sample",
+        "created_date": "2025-11-09 19:37:14",
+        "cards": [
+            {
+                "question": "Question 1",
+                "answer": "Answer 1"
+            },
+            {
+                "question": "Question 2",
+                "answer": "Answer 1"
+            },
+            {
+                "question": "Question 2",
+                "answer": "Answer 1"
+            },
+            {
+                "question": "Question 4",
+                "answer": "Answer 1"
             }
         ]
     }

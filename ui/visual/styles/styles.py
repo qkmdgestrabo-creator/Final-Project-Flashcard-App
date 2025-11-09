@@ -1,7 +1,5 @@
 # FINAL PROJECT FLASHCARD APP / ui / visual / styles / styles.py
 
-# FINAL PROJECT FLASHCARD APP / ui / visual / styles / styles.py
-
 
 def get_sidebar_styles():
     return {
@@ -927,6 +925,7 @@ def get_multiple_choice_styles():
         """
     }
 
+
 def get_existing_flashcard_styles():
     return {
         # === Main Page ===
@@ -1019,37 +1018,34 @@ def get_existing_flashcard_styles():
     }
     # Add this to your styles.py file
 
+
 def get_pomodoro_styles():
     return {
         # Break Overlay Styles
         "break_overlay": """
             BreakOverlay {
-                background-color: rgba(120, 120, 120, 0.9);
+                background-color: rgba(246, 242, 238, 0.8);
+                border: none;
+                
             }
         """,
         
-        # Default styles (for large windows)
         "break_label": """
             QLabel {
-                color: #C0392B;
-                font-size: 32px;
-                font-weight: bold;
+                background-color: rgba(246, 242, 238);
                 padding: 20px;
-                background-color: white;
                 border-radius: 15px;
-                margin: 10px;
+                
             }
         """,
         
         "break_message": """
             QLabel {
+                background-color: rgba(246, 242, 238);
                 color: #2C3E50;
                 font-size: 18px;
                 font-weight: normal;
-                padding: 15px;
-                background-color: white;
                 border-radius: 10px;
-                margin: 5px;
             }
         """,
         
@@ -1058,10 +1054,9 @@ def get_pomodoro_styles():
                 color: #8E44AD;
                 font-size: 16px;
                 font-weight: bold;
-                padding: 10px;
-                background-color: white;
                 border-radius: 8px;
-                margin: 5px;
+                background-color: rgba(246, 242, 238);
+
             }
         """,
         
@@ -1070,11 +1065,9 @@ def get_pomodoro_styles():
                 color: #C0392B;
                 font-size: 48px;
                 font-weight: bold;
-                font-family: 'Monospace';
                 padding: 25px;
-                background-color: white;
+                background-color: rgba(246, 242, 238);
                 border-radius: 15px;
-                margin: 15px;
             }
         """,
         
@@ -1082,135 +1075,10 @@ def get_pomodoro_styles():
             QLabel {
                 color: #2C3E50;
                 font-size: 14px;
-                padding: 12px;
-                background-color: white;
                 border-radius: 8px;
-                margin: 5px;
+                background-color: rgba(246, 242, 238);
             }
         """,
-        
-        # Small window styles (600-800px)
-        "break_label_small": """
-            QLabel {
-                color: #C0392B;
-                font-size: 24px;
-                font-weight: bold;
-                padding: 15px;
-                background-color: white;
-                border-radius: 15px;
-                margin: 8px;
-            }
-        """,
-        
-        "break_message_small": """
-            QLabel {
-                color: #2C3E50;
-                font-size: 16px;
-                font-weight: normal;
-                padding: 12px;
-                background-color: white;
-                border-radius: 10px;
-                margin: 4px;
-            }
-        """,
-        
-        "break_progress_small": """
-            QLabel {
-                color: #8E44AD;
-                font-size: 14px;
-                font-weight: bold;
-                padding: 8px;
-                background-color: white;
-                border-radius: 8px;
-                margin: 4px;
-            }
-        """,
-        
-        "break_timer_small": """
-            QLabel {
-                color: #C0392B;
-                font-size: 36px;
-                font-weight: bold;
-                font-family: 'Monospace';
-                padding: 20px;
-                background-color: white;
-                border-radius: 15px;
-                margin: 12px;
-            }
-        """,
-        
-        "break_instruction_small": """
-            QLabel {
-                color: #2C3E50;
-                font-size: 12px;
-                padding: 10px;
-                background-color: white;
-                border-radius: 8px;
-                margin: 4px;
-            }
-        """,
-        
-        # Very small window styles (<600px)
-        "break_label_xsmall": """
-            QLabel {
-                color: #C0392B;
-                font-size: 20px;
-                font-weight: bold;
-                padding: 12px;
-                background-color: white;
-                border-radius: 15px;
-                margin: 6px;
-            }
-        """,
-        
-        "break_message_xsmall": """
-            QLabel {
-                color: #2C3E50;
-                font-size: 14px;
-                font-weight: normal;
-                padding: 10px;
-                background-color: white;
-                border-radius: 10px;
-                margin: 3px;
-            }
-        """,
-        
-        "break_progress_xsmall": """
-            QLabel {
-                color: #8E44AD;
-                font-size: 12px;
-                font-weight: bold;
-                padding: 6px;
-                background-color: white;
-                border-radius: 8px;
-                margin: 3px;
-            }
-        """,
-        
-        "break_timer_xsmall": """
-            QLabel {
-                color: #C0392B;
-                font-size: 28px;
-                font-weight: bold;
-                font-family: 'Monospace';
-                padding: 15px;
-                background-color: white;
-                border-radius: 15px;
-                margin: 8px;
-            }
-        """,
-        
-        "break_instruction_xsmall": """
-            QLabel {
-                color: #2C3E50;
-                font-size: 11px;
-                padding: 8px;
-                background-color: white;
-                border-radius: 8px;
-                margin: 3px;
-            }
-        """,
-        
         # Timer Button States
         "timer_button_forced_break": """
             QPushButton {
@@ -1262,7 +1130,6 @@ def get_pomodoro_styles():
         "settings_dialog": """
             QDialog {
                 background-color: #ECF0F1;
-                border: 3px solid #34495E;
                 border-radius: 15px;
             }
             QWidget {
@@ -1276,7 +1143,6 @@ def get_pomodoro_styles():
                 font-size: 14px;
                 font-weight: bold;
                 padding: 8px;
-                background-color: #FFFFFF;
                 border-radius: 5px;
             }
         """,
@@ -1286,30 +1152,31 @@ def get_pomodoro_styles():
                 background-color: white;
                 border-radius: 8px;
                 padding: 8px;
-                font-size: 14px;
+                font-size: 12px;
                 color: #2C3E50;
                 font-weight: bold;
-                min-width: 80px;
+                min-width: 12px;
             }
             QSpinBox:focus {
-                border: 3px solid #E74C3C;
                 background-color: #FFF8E1;
             }
             QSpinBox::up-button {
-                background-color: #3498DB;
+                background-color: #C5DBF2;
                 border-radius: 3px;
-                width: 20px;
+                width: 15px;
             }
             QSpinBox::down-button {
-                background-color: #3498DB;
+                background-color: #C5DBF2;
                 border-radius: 3px;
-                width: 20px;
+                width: 15px;
             }
             QSpinBox::up-arrow {
-                color: white;
+                content: "▲";
+                color: black;          
             }
             QSpinBox::down-arrow {
-                color: white;
+                 content: "▼";
+                 color: black;
             }
         """,
         
@@ -1351,6 +1218,28 @@ def get_pomodoro_styles():
             }
             QPushButton:hover {
                 background-color: #C0392B;
+            }
+        ""","warning_message_box": """
+            QMessageBox {
+                background-color: #FEF5E7;
+                border-radius: 15px;
+            }
+            QMessageBox QLabel {
+                color: #2C3E50;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QMessageBox QPushButton {
+                background-color: #C1E1A8;
+                color: white;
+                border-radius: 10px;
+                font-weight: bold;
+                padding: 8px 20px;
+                font-size: 14px;
+                min-width: 80px;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #A9D585;
             }
         """
     }

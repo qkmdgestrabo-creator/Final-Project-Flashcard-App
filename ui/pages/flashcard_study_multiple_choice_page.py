@@ -36,7 +36,7 @@ class MultipleChoiceStudy(QWidget):
         self.set_name_label.setStyleSheet(self.styles["set_name_label"])
         header_layout.addWidget(self.set_name_label)
         
-        self.stats_label = QLabel("0/0 | Rem: 0/0")
+        self.stats_label = QLabel("0/0 | Remaining: 0/0")
         self.stats_label.setStyleSheet(self.styles["stats_label"])
         header_layout.addWidget(self.stats_label)
         
