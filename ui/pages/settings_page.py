@@ -24,7 +24,6 @@ class SettingsPage(QWidget):
         notify_group = QGroupBox("Notifications")
         notify_layout = QVBoxLayout()
 
-        self.notify_check = QCheckBox("Enable notifications")
         self.sound_check = QCheckBox("Play sound")
 
         #Volume tracker (slider + label)
@@ -35,23 +34,24 @@ class SettingsPage(QWidget):
 
         self.volume_label = QLabel("Volume: 50%")
 
-        #Enable/disable volume when "Play sound" is checked
+        # Enable/disable volume slider when "Play sound" is checked
         self.sound_check.stateChanged.connect(
-            lambda state: self.volume_slider.setEnabled(state == Qt.CheckState.Checked)
+            lambda state: self.volume_slider.setEnabled(
+                state == Qt.CheckState.Checked.value
+            )
         )
 
-        #Update label when slider moves
+        # Update label when slider moves
         self.volume_slider.valueChanged.connect(
             lambda value: self.volume_label.setText(f"Volume: {value}%")
         )
 
-        notify_layout.addWidget(self.notify_check)
         notify_layout.addWidget(self.sound_check)
         notify_layout.addWidget(self.volume_slider)
         notify_layout.addWidget(self.volume_label)
         notify_group.setLayout(notify_layout)
 
-        #Theme settings group
+        # Theme settings group
         theme_group = QGroupBox("Appearance")
         theme_layout = QVBoxLayout()
 
@@ -62,7 +62,7 @@ class SettingsPage(QWidget):
         theme_layout.addWidget(self.theme_combo)
         theme_group.setLayout(theme_layout)
 
-        #Font settings group
+        # Font settings group
         font_group = QGroupBox("Font Settings")
         font_layout = QVBoxLayout()
 
@@ -74,7 +74,7 @@ class SettingsPage(QWidget):
         font_layout.addWidget(self.font_size)
         font_group.setLayout(font_layout)
 
-        #Color settings group
+        # Color settings group
         color_group = QGroupBox("Background Color")
         color_layout = QVBoxLayout()
 
@@ -84,11 +84,11 @@ class SettingsPage(QWidget):
         color_layout.addWidget(self.color_button)
         color_group.setLayout(color_layout)
 
-        #Save settings button
+        # Save settings button
         self.save_button = QPushButton("Save Settings")
         self.save_button.clicked.connect(self.save_settings)
 
-        #Add all groups to layout
+        # Add all groups to layout
         layout.addWidget(title)
         layout.addWidget(notify_group)
         layout.addWidget(theme_group)
@@ -120,7 +120,6 @@ class SettingsPage(QWidget):
             f"Theme: {theme}\nFont Size: {font_size}\nBackground: {color}\nVolume: {volume}%"
         )
 
-    #Custom styled message box (with success.png)
     def show_success_message(self, title, message):
         msg = QMessageBox()
         msg.setWindowTitle(title)
@@ -128,12 +127,10 @@ class SettingsPage(QWidget):
         msg.setIcon(QMessageBox.Icon.NoIcon)
         msg.setStandardButtons(QMessageBox.StandardButton.Ok)
 
-        #Custom icon
         icon_path = "success.png"
         msg.setIconPixmap(QPixmap(icon_path).scaled(48, 48, Qt.AspectRatioMode.KeepAspectRatio))
         msg.setWindowIcon(QIcon(icon_path))
 
-        #Style: white background, black text, green rounded OK button
         msg.setStyleSheet("""
             QMessageBox {
                 background-color: #ffffff;
@@ -156,3 +153,4 @@ class SettingsPage(QWidget):
         """)
 
         msg.exec()
+
