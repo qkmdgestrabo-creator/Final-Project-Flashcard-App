@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QIcon
-from streamlit import success
 
 
 class SettingsPage(QWidget):
@@ -17,7 +16,7 @@ class SettingsPage(QWidget):
 
     def setup_ui(self):
         layout = QVBoxLayout()
-        self.setStyleSheet("color: black;")  
+        self.setStyleSheet("color: black;")
 
         title = QLabel("<h1>Application Settings</h1>")
 
@@ -121,7 +120,7 @@ class SettingsPage(QWidget):
             f"Theme: {theme}\nFont Size: {font_size}\nBackground: {color}\nVolume: {volume}%"
         )
 
-    #Custom styled message box
+    #Custom styled message box (with success.png)
     def show_success_message(self, title, message):
         msg = QMessageBox()
         msg.setWindowTitle(title)
@@ -130,7 +129,7 @@ class SettingsPage(QWidget):
         msg.setStandardButtons(QMessageBox.StandardButton.Ok)
 
         #Custom icon
-        icon_path = "success.png" 
+        icon_path = "success.png"
         msg.setIconPixmap(QPixmap(icon_path).scaled(48, 48, Qt.AspectRatioMode.KeepAspectRatio))
         msg.setWindowIcon(QIcon(icon_path))
 
