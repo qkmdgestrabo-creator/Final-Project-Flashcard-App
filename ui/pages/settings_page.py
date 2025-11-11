@@ -3,20 +3,21 @@
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QCheckBox, QSlider, QComboBox,
-    QGroupBox, QPushButton, QColorDialog, QMessageBox, QSpinBox
+    QGroupBox, QPushButton, QColorDialog, QMessageBox, QSpinBox, QApplication
 )
 from PyQt6.QtCore import Qt, QSettings
 from PyQt6.QtGui import QPixmap, QIcon, QFont
+import sys
 
 
 class SettingsPage(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.selected_color = "#FFFFFF"  
-        self.notifications_enabled = False  
-        self.settings = QSettings("MyApp", "SettingsPage")  # persistent storage
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.selected_color = "#FFFFFF"
+        self.notifications_enabled = False
+        self.settings = QSettings("MyApp", "SettingsPage")  
         self.setup_ui()
-        self.load_settings()  # load saved settings at startup
+        self.load_settings()  
 
     def setup_ui(self):
         layout = QVBoxLayout()
@@ -32,7 +33,7 @@ class SettingsPage(QWidget):
         self.enable_notify_check.stateChanged.connect(self.toggle_enable_notifications)
 
         self.sound_check = QCheckBox("Play sound")
-        self.sound_check.setEnabled(False)  
+        self.sound_check.setEnabled(False)
 
         self.volume_slider = QSlider(Qt.Orientation.Horizontal)
         self.volume_slider.setRange(0, 100)
@@ -46,7 +47,6 @@ class SettingsPage(QWidget):
                 state == Qt.CheckState.Checked.value and self.notifications_enabled
             )
         )
-
         self.volume_slider.valueChanged.connect(
             lambda value: self.volume_label.setText(f"Volume: {value}%")
         )
@@ -69,7 +69,7 @@ class SettingsPage(QWidget):
         theme_layout.addWidget(self.theme_combo)
         theme_group.setLayout(theme_layout)
 
-        # Font settings
+        # Font settings 
         font_group = QGroupBox("Font Settings")
         font_layout = QVBoxLayout()
 
@@ -82,7 +82,7 @@ class SettingsPage(QWidget):
         font_layout.addWidget(self.font_size)
         font_group.setLayout(font_layout)
 
-        # Color settings
+        # Background color
         color_group = QGroupBox("Background Color")
         color_layout = QVBoxLayout()
 
@@ -96,7 +96,7 @@ class SettingsPage(QWidget):
         self.save_button = QPushButton("Save Settings")
         self.save_button.clicked.connect(self.save_settings)
 
-        # Add all groups to layout
+        # Add all groups 
         layout.addWidget(title)
         layout.addWidget(notify_group)
         layout.addWidget(theme_group)
@@ -104,8 +104,9 @@ class SettingsPage(QWidget):
         layout.addWidget(color_group)
         layout.addWidget(self.save_button)
         layout.addStretch()
-
         self.setLayout(layout)
+
+    # SETTINGS LOGIC 
 
     def toggle_enable_notifications(self, state):
         self.notifications_enabled = state == Qt.CheckState.Checked.value
@@ -115,27 +116,28 @@ class SettingsPage(QWidget):
             self.sound_check.setChecked(False)
 
     def apply_theme(self, theme_name):
-        if theme_name == "Light":
-            self.setStyleSheet(f"background-color: {self.selected_color}; color: black;")
-        elif theme_name == "Dark":
-            self.setStyleSheet(f"background-color: #2b2b2b; color: white;")
-        else:
-            self.setStyleSheet(f"background-color: {self.selected_color}; color: black;")
+        """Apply theme across the entire app (not just this page)."""
+        app = QApplication.instance()
+        if theme_name == "Dark":
+            app.setStyleSheet("QWidget { background-color: #2b2b2b; color: white; }")
+        elif theme_name == "Light":
+            app.setStyleSheet("QWidget { background-color: white; color: black; }")
+        else:  
+            app.setStyleSheet("QWidget { background-color: white; color: black; }")
 
     def apply_font_size(self, size):
+        """Change font size for the entire app dynamically."""
         font = QFont()
         font.setPointSize(size)
-        self.setFont(font)
+        QApplication.instance().setFont(font)  
 
     def choose_color(self):
         color = QColorDialog.getColor()
         if color.isValid():
             self.selected_color = color.name()
-            self.setStyleSheet(f"background-color: {self.selected_color}; color: black;")
-            self.show_success_message(
-                "Color Selected",
-                f"Chosen color: {self.selected_color}"
-            )
+            app = QApplication.instance()
+            app.setStyleSheet(f"QWidget {{ background-color: {self.selected_color}; color: black; }}")
+            self.show_success_message("Color Selected", f"Chosen color: {self.selected_color}")
 
     def save_settings(self):
         """Save settings persistently using QSettings."""
@@ -156,23 +158,24 @@ class SettingsPage(QWidget):
         )
 
     def load_settings(self):
-        """Load previously saved settings if they exist."""
+        """Load previously saved settings."""
         theme = self.settings.value("theme", "Light")
         font_size = int(self.settings.value("font_size", 14))
         color = self.settings.value("color", "#FFFFFF")
         volume = int(self.settings.value("volume", 50))
-        notifications = self.settings.value("notifications", "false") == "true"
+        notifications = self.settings.value("notifications", False, type=bool)
 
-        # Apply loaded values
+        # Apply saved values
         self.theme_combo.setCurrentText(theme)
         self.font_size.setValue(font_size)
         self.selected_color = color
         self.volume_slider.setValue(volume)
-        self.notifications_enabled = notifications
         self.enable_notify_check.setChecked(notifications)
 
+        self.apply_theme(theme)
         self.apply_font_size(font_size)
-        self.setStyleSheet(f"background-color: {color}; color: black;")
+
+    # UI HELPER 
 
     def show_success_message(self, title, message):
         msg = QMessageBox()
@@ -207,6 +210,7 @@ class SettingsPage(QWidget):
         """)
 
         msg.exec()
+
 
 
 
