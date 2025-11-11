@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QCheckBox, QSlider, QComboBox,
     QGroupBox, QPushButton, QColorDialog, QMessageBox, QSpinBox
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSettings
 from PyQt6.QtGui import QPixmap, QIcon, QFont
 
 
@@ -14,7 +14,9 @@ class SettingsPage(QWidget):
         super().__init__()
         self.selected_color = "#FFFFFF"  
         self.notifications_enabled = False  
+        self.settings = QSettings("MyApp", "SettingsPage")  # persistent storage
         self.setup_ui()
+        self.load_settings()  # load saved settings at startup
 
     def setup_ui(self):
         layout = QVBoxLayout()
@@ -22,19 +24,16 @@ class SettingsPage(QWidget):
 
         title = QLabel("<h1>Application Settings</h1>")
 
-        #Notification settings
+        # Notification settings
         notify_group = QGroupBox("Notifications")
         notify_layout = QVBoxLayout()
 
-        #"Enable Notifications" checkbox
         self.enable_notify_check = QCheckBox("Enable notifications")
         self.enable_notify_check.stateChanged.connect(self.toggle_enable_notifications)
 
-        #Existing "Play sound" checkbox
         self.sound_check = QCheckBox("Play sound")
         self.sound_check.setEnabled(False)  
 
-        #Volume tracker (slider + label)
         self.volume_slider = QSlider(Qt.Orientation.Horizontal)
         self.volume_slider.setRange(0, 100)
         self.volume_slider.setValue(50)
@@ -42,26 +41,23 @@ class SettingsPage(QWidget):
 
         self.volume_label = QLabel("Volume: 50%")
 
-        #Enable/disable volume slider when "Play sound" is checked
         self.sound_check.stateChanged.connect(
             lambda state: self.volume_slider.setEnabled(
                 state == Qt.CheckState.Checked.value and self.notifications_enabled
             )
         )
 
-        #Update label when slider moves
         self.volume_slider.valueChanged.connect(
             lambda value: self.volume_label.setText(f"Volume: {value}%")
         )
 
-        #Add widgets to notification layout
         notify_layout.addWidget(self.enable_notify_check)
         notify_layout.addWidget(self.sound_check)
         notify_layout.addWidget(self.volume_slider)
         notify_layout.addWidget(self.volume_label)
         notify_group.setLayout(notify_layout)
 
-        #Appearance settings
+        # Appearance settings
         theme_group = QGroupBox("Appearance")
         theme_layout = QVBoxLayout()
 
@@ -73,7 +69,7 @@ class SettingsPage(QWidget):
         theme_layout.addWidget(self.theme_combo)
         theme_group.setLayout(theme_layout)
 
-        #Font settings
+        # Font settings
         font_group = QGroupBox("Font Settings")
         font_layout = QVBoxLayout()
 
@@ -86,7 +82,7 @@ class SettingsPage(QWidget):
         font_layout.addWidget(self.font_size)
         font_group.setLayout(font_layout)
 
-        #Color settings
+        # Color settings
         color_group = QGroupBox("Background Color")
         color_layout = QVBoxLayout()
 
@@ -96,11 +92,11 @@ class SettingsPage(QWidget):
         color_layout.addWidget(self.color_button)
         color_group.setLayout(color_layout)
 
-        #Save button
+        # Save button
         self.save_button = QPushButton("Save Settings")
         self.save_button.clicked.connect(self.save_settings)
 
-        #Add all groups to layout
+        # Add all groups to layout
         layout.addWidget(title)
         layout.addWidget(notify_group)
         layout.addWidget(theme_group)
@@ -111,9 +107,7 @@ class SettingsPage(QWidget):
 
         self.setLayout(layout)
 
-
     def toggle_enable_notifications(self, state):
-        """Enable or disable all notification options."""
         self.notifications_enabled = state == Qt.CheckState.Checked.value
         self.sound_check.setEnabled(self.notifications_enabled)
         self.volume_slider.setEnabled(False)
@@ -121,16 +115,14 @@ class SettingsPage(QWidget):
             self.sound_check.setChecked(False)
 
     def apply_theme(self, theme_name):
-        """Apply dark/light theme across the app."""
         if theme_name == "Light":
-            self.setStyleSheet("background-color: white; color: black;")
+            self.setStyleSheet(f"background-color: {self.selected_color}; color: black;")
         elif theme_name == "Dark":
-            self.setStyleSheet("background-color: #2b2b2b; color: white;")
-        else:  
-            self.setStyleSheet("background-color: white; color: black;")
+            self.setStyleSheet(f"background-color: #2b2b2b; color: white;")
+        else:
+            self.setStyleSheet(f"background-color: {self.selected_color}; color: black;")
 
     def apply_font_size(self, size):
-        """Change font size for the entire interface."""
         font = QFont()
         font.setPointSize(size)
         self.setFont(font)
@@ -146,21 +138,41 @@ class SettingsPage(QWidget):
             )
 
     def save_settings(self):
-        theme = self.theme_combo.currentText()
-        font_size = self.font_size.value()
-        color = getattr(self, "selected_color", "#FFFFFF")
-        volume = self.volume_slider.value()
-        notifications = "Enabled" if self.notifications_enabled else "Disabled"
+        """Save settings persistently using QSettings."""
+        self.settings.setValue("theme", self.theme_combo.currentText())
+        self.settings.setValue("font_size", self.font_size.value())
+        self.settings.setValue("color", self.selected_color)
+        self.settings.setValue("volume", self.volume_slider.value())
+        self.settings.setValue("notifications", self.notifications_enabled)
 
         self.show_success_message(
             "Success!",
             f"Settings saved successfully!\n\n"
-            f"Notifications: {notifications}\n"
-            f"Theme: {theme}\n"
-            f"Font Size: {font_size}\n"
-            f"Background: {color}\n"
-            f"Volume: {volume}%"
+            f"Notifications: {'Enabled' if self.notifications_enabled else 'Disabled'}\n"
+            f"Theme: {self.theme_combo.currentText()}\n"
+            f"Font Size: {self.font_size.value()}\n"
+            f"Background: {self.selected_color}\n"
+            f"Volume: {self.volume_slider.value()}%"
         )
+
+    def load_settings(self):
+        """Load previously saved settings if they exist."""
+        theme = self.settings.value("theme", "Light")
+        font_size = int(self.settings.value("font_size", 14))
+        color = self.settings.value("color", "#FFFFFF")
+        volume = int(self.settings.value("volume", 50))
+        notifications = self.settings.value("notifications", "false") == "true"
+
+        # Apply loaded values
+        self.theme_combo.setCurrentText(theme)
+        self.font_size.setValue(font_size)
+        self.selected_color = color
+        self.volume_slider.setValue(volume)
+        self.notifications_enabled = notifications
+        self.enable_notify_check.setChecked(notifications)
+
+        self.apply_font_size(font_size)
+        self.setStyleSheet(f"background-color: {color}; color: black;")
 
     def show_success_message(self, title, message):
         msg = QMessageBox()
@@ -195,6 +207,7 @@ class SettingsPage(QWidget):
         """)
 
         msg.exec()
+
 
 
 
